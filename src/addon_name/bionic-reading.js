@@ -20,6 +20,13 @@
     return Math.floor(text.length / 2);
   }
 
+  function forTextNodes(elem, funct) {
+    elem.normalize();
+    let nodes = [];
+    forTextNodesInTree(elem, nodes, funct);
+    if (nodes.length > 0) funct(nodes);
+  }
+
   /**
    * Run funct on each same-line-breaking nodes.
    * You should run funct on remaining nodes after running this function
@@ -30,7 +37,7 @@
    *    node may be a text node, or an element.
    * @returns {void}
    */
-  function forEachChildTextNodes(elem, nodes, funct) {
+  function forTextNodesInTree(elem, nodes, funct) {
     const children = elem.childNodes;
     for (const child of children) {
       if (child.nodeType === Node.ELEMENT_NODE) {
@@ -48,7 +55,6 @@
         nodes.push(child);
       }
     }
-    if (nodes.length > 0) funct(nodes);
   }
 
   /**
@@ -78,7 +84,6 @@
     // Identify a word (start..end) -> get bold length
     // -> add nodes for the word -> when one node done, replace original node
     // At finish, startNodeIndex == endNodeIndex == nodes.length, startPos == endPos == 0
-    console.log(nodes);
     let startNodeIndex = 0;
     let startPos = 0;
     let endNodeIndex = 0;
@@ -148,5 +153,5 @@
   }
 
   const cardContainer = document.getElementById("qa");
-  forEachChildTextNodes(cardContainer, [], boldNodes);
+  forTextNodes(cardContainer, boldNodes);
 })();
