@@ -1,14 +1,14 @@
 {
-    "display_name": "",
-    "module_name": "addon_name",
-    "repo_name": "",
+    "display_name": "Bionic Reading",
+    "module_name": "bionic_reading",
+    "repo_name": "anki-bionic-reading",
     "ankiweb_id": "",
-    "author": "",
+    "author": "Bluegreenmagick",
     "conflicts": [],
     "targets": [
         "anki21"
     ],
-    "min_anki_version" : "2.1.45",
-    "max_tested_anki_version" : "2.1.46",
+    "min_anki_version": "2.1.41",
+    "max_tested_anki_version": "2.1.49",
     "ankiweb_conflicts_with_local": false
 }

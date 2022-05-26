@@ -1,22 +1,21 @@
-<b>This add-on was funded by the Anki Palace. Please consider supporting our work using the links below so we can continue to fund add-on projects like this.</b>
-<b>This add-on was funded by the [AnKing Memberships](https://www.ankipalace.com/memberships). Please consider supporting us so we can continue to fund add-on projects like this.</b>
+# Bionic Reading
 
-You must be on Anki *** to use this add-on
+Add-on for [bionic reading] on Anki cards
 
 ## How to Use
-***
+
+---
 
 ## Screenshots
-<img src="https://raw.githubusercontent.com/AnKingMed/anki-set-ease/master/screenshots/EditEase.gif?raw=true">
-  <br>
 
 ## Problems, Bugs, Errors, Improvements
+
 If you find a serious bug, please submit it on <a href="https://github.com/ankipalace/" rel="nofollow">Github</a> or email us at ankingmed@gmail.com. Please remember that we are not coders and thus may not be able to provide support.
 
 ## Changelog:
+
   <br>
 2021-*****: Initial Release
-
 
 ### If you like these, please consider donating to this project
 
