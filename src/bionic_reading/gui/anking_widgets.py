@@ -5,7 +5,7 @@ from aqt.utils import openLink
 
 def icon_button(icon_data: Tuple[str, Tuple[int, int], str]) -> QToolButton:
     (image, size, url) = icon_data
-    icon = QIcon(QPixmap(f":/AnKing/{image}"))
+    icon = QIcon(QPixmap(f"AnKing:{image}"))
     button = QToolButton()
     button.setIcon(icon)
     button.setIconSize(QSize(size[0], size[1]))

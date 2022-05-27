@@ -1,1 +1,3 @@
-from .resources.anki21 import icons_rc  # type: ignore # noqa: F401
+from .resources import initialize_qt_resources  # type: ignore # noqa: F401
+
+initialize_qt_resources()
