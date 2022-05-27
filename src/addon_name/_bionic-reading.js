@@ -22,8 +22,9 @@
 
   // Ignore node if any of the filters return true
   const excludeFilters = [
-    (node) => node.tagName === "SCRIPT",
-    (node) => node.tagName === "STYLE",
+    (elem) => elem.tagName === "SCRIPT",
+    (elem) => elem.tagName === "STYLE",
+    (elem) => elem.classList.contains("cloze"),
   ];
 
   function newBoldElement(text) {
