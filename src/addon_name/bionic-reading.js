@@ -17,57 +17,8 @@
    * @returns {number}
    */
   function getBoldLength(text) {
+    console.log("bold: ", text);
     return Math.floor(text.length / 2);
-  }
-
-  function forTextNodes(elem, funct) {
-    elem.normalize();
-    let nodes = [];
-    forTextNodesInTree(elem, nodes, funct);
-    if (nodes.length > 0) funct(nodes);
-  }
-
-  /**
-   * Run funct on each same-line-breaking nodes.
-   * You should run funct on remaining nodes after running this function
-   *
-   * @param {Node} elem
-   * @param {Node[]} - list of text nodes.
-   * @param {(nodes: Node[]) -> void} funct - nodes: non empty list of text nodes
-   *    node may be a text node, or an element.
-   * @returns {void}
-   */
-  function forTextNodesInTree(elem, nodes, funct) {
-    const children = elem.childNodes;
-    for (const child of children) {
-      if (child.nodeType === Node.ELEMENT_NODE) {
-        const style = window.getComputedStyle(child);
-        if (style === "inline" || style === "inline-block") {
-          forEachChildTextNodes(child, nodes, funct);
-        } else {
-          if (nodes.length > 0) {
-            funct(nodes);
-            nodes = [];
-          }
-          forEachChildTextNodes(child, nodes, funct);
-        }
-      } else if (child.nodeType === Node.TEXT_NODE) {
-        nodes.push(child);
-      }
-    }
-  }
-
-  /**
-   * Replace node with nodes
-   * @param {Node} node
-   * @param {Node[]} nodes
-   */
-  function replaceNode(node, nodes) {
-    const parent = node.parentNode;
-    for (let add of nodes) {
-      parent.insertBefore(add, node);
-    }
-    parent.removeChild(node);
   }
 
   function newBoldElement(text) {
@@ -76,82 +27,174 @@
     return elem;
   }
 
-  /**
-   * Bionic-bold each word in nodes text
-   * @param {Node[]} nodes - list of text nodes
-   */
-  function boldNodes(nodes) {
-    // Identify a word (start..end) -> get bold length
-    // -> add nodes for the word -> when one node done, replace original node
-    // At finish, startNodeIndex == endNodeIndex == nodes.length, startPos == endPos == 0
-    let startNodeIndex = 0;
-    let startPos = 0;
-    let endNodeIndex = 0;
-    let endPos = 0; // Can be considered position of the whitespace
-    let textContents = nodes.map((node) => node.textContent);
-    let replaceNodes = [];
+  // Ignore node if any of the filters return true
+  const excludeFilters = [
+    (node) => node.tagName === "SCRIPT",
+    (node) => node.tagName === "STYLE",
+  ];
 
-    while (!(startNodeIndex === nodes.length && startPos === 0)) {
-      // identify a word
+  // Bolds a line of words
+  class BionicReaderBolder {
+    constructor(nodes) {
+      console.log(nodes);
+      this.nodes = nodes;
+      this.startNodeIndex = 0;
+      this.startPos = 0;
+      this.replaceNodes = [];
+      while (!this.isFinished()) {
+        this.runWithinNode();
+        this.runInterNode();
+      }
+    }
+
+    static run(nodes) {
+      new BionicReaderBolder(nodes);
+    }
+
+    isFinished() {
+      return this.startNodeIndex === this.nodes.length;
+    }
+
+    replaceNode() {
+      const node = this.nodes[this.startNodeIndex];
+      const parent = node.parentNode;
+      console.log(node, parent);
+      for (let add of this.replaceNodes) {
+        parent.insertBefore(add, node);
+      }
+      parent.removeChild(node);
+      this.replaceNodes = [];
+    }
+
+    runWithinNode() {
+      const textContent = this.nodes[this.startNodeIndex].textContent;
+      let nextPos = textContent.indexOf(" ", this.startPos);
+      while (nextPos !== -1) {
+        const word = textContent.substring(this.startPos, nextPos);
+        const boldLength = getBoldLength(word);
+        this.replaceNodes.push(newBoldElement(word.substring(0, boldLength)));
+        this.replaceNodes.push(
+          document.createTextNode(word.substring(boldLength, nextPos) + " ")
+        );
+        this.startPos = nextPos + 1;
+        nextPos = textContent.indexOf(" ", this.startPos);
+      }
+    }
+
+    // after this, startPos is likely to be at whitespace char
+    runInterNode() {
       let word = "";
+      let endNodeIndex = this.startNodeIndex;
+      let endPos = this.startPos; // last word char pos + 1
 
-      while (endNodeIndex < nodes.length) {
-        const nextPos = textContents[endNodeIndex].indexOf(" ", endPos);
-        if (nextPos !== -1) {
-          word += textContents[endNodeIndex].substring(endPos, nextPos);
+      // Find word boundary
+      while (endNodeIndex < this.nodes.length) {
+        const textContent = this.nodes[endNodeIndex].textContent;
+        let nextPos = textContent.indexOf(" ", endPos);
+        if (nextPos === -1) {
+          word += textContent.substring(endPos);
+          endNodeIndex += 1;
+          endPos = 0;
+        } else {
+          word += textContent.substring(endPos, nextPos);
           endPos = nextPos;
           break;
-        } else {
-          word += textContents[endNodeIndex].substring(endPos);
-          endPos = 0;
-          endNodeIndex += 1;
         }
       }
-      // word may be ""
+      // Calculate bold length
       let remainingBoldLength = getBoldLength(word);
 
+      // Bold part of word
       while (remainingBoldLength > 0) {
-        const textContent = textContents[startNodeIndex];
-
-        if (textContent.length <= startPos + remainingBoldLength) {
-          const boldText = textContent.substring(startPos, textContent.length);
-          replaceNodes.push(newBoldElement(boldText));
-          replaceNode(nodes[startNodeIndex], replaceNodes);
-          remainingBoldLength -= boldText.length;
-          replaceNodes = [];
-          startPos = 0;
-          startNodeIndex += 1;
+        const textContent = this.nodes[this.startNodeIndex].textContent;
+        if (remainingBoldLength > textContent.length - this.startPos) {
+          const wordPart = textContent.substring(this.startPos);
+          remainingBoldLength -= wordPart.length;
+          this.replaceNodes.push(newBoldElement(wordPart));
+          this.replaceNode();
+          this.startNodeIndex += 1;
+          this.startPos = 0;
         } else {
-          const boldText = textContent.substring(
-            startPos,
-            startPos + remainingBoldLength
+          const wordPart = textContent.substring(
+            this.startPos,
+            this.startPos + remainingBoldLength
           );
-          replaceNodes.push(newBoldElement(boldText));
-          remainingBoldLength = 0;
-          startPos += boldText.length;
+          this.startPos += remainingBoldLength;
+          this.replaceNodes.push(newBoldElement(wordPart));
+          remainingBoldLength -= wordPart.length;
         }
       }
 
-      while (startNodeIndex !== nodes.length) {
-        const textContent = textContents[startNodeIndex];
-        if (startNodeIndex < endNodeIndex) {
-          const text = textContent.substring(startPos);
-          replaceNodes.push(document.createTextNode(text));
-          replaceNode(nodes[startNodeIndex], replaceNodes);
-          replaceNodes = [];
-          startNodeIndex += 1;
-          startPos = 0;
-        } else {
-          const text = textContent.substring(startPos, endPos);
-          startPos = endPos + 1;
-          endPos = startPos + 1;
-          replaceNodes.push(document.createTextNode(text));
-          break;
-        }
+      // Add non-bolded part of words
+      while (this.startNodeIndex < endNodeIndex) {
+        const textContent = this.nodes[this.startNodeIndex].textContent;
+        const wordPart = textContent.substring(this.startPos);
+        this.replaceNodes.push(document.createTextNode(wordPart));
+        this.replaceNode();
+        this.startNodeIndex += 1;
+        this.startPos = 0;
+      }
+
+      if (this.startPos < endPos) {
+        const textContent = this.nodes[this.startNodeIndex].textContent;
+        const wordPart = textContent.substring(this.startPos, endPos);
+        this.replaceNodes.push(document.createTextNode(wordPart));
+        this.startPos = endPos;
       }
     }
   }
 
-  const cardContainer = document.getElementById("qa");
-  forTextNodes(cardContainer, boldNodes);
+  /**
+   * Builds a list of (list of nodes that makes up one non-line-broken line)
+   * @param {Node} elem
+   * @param {Node[][]} - list of list of text nodes. Must not be empty, last element must be a list.
+   * @returns {void}
+   */
+  function forTextNodesInTree(elem, nodes, exclude = false) {
+    const children = elem.childNodes;
+    for (const filter of excludeFilters) {
+      if (filter(elem)) {
+        exclude = true;
+        break;
+      }
+    }
+    for (const child of children) {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        const style = window.getComputedStyle(child);
+        if (
+          child.tagName !== "BR" &&
+          (style === "inline" || style === "inline-block")
+        ) {
+          forTextNodesInTree(child, nodes, exclude);
+        } else {
+          if (nodes[nodes.length - 1].length > 0) {
+            nodes.push([]);
+          }
+          forTextNodesInTree(child, nodes, exclude);
+        }
+      } else if (
+        !exclude &&
+        child.nodeType === Node.TEXT_NODE &&
+        child.textContent.length > 0
+      ) {
+        nodes[nodes.length - 1].push(child);
+      }
+    }
+  }
+
+  function makeBionic() {
+    const cardContainer = document.getElementById("qa");
+    cardContainer.normalize();
+
+    let nodesLines = [[]];
+    forTextNodesInTree(cardContainer, nodesLines);
+    console.log(nodesLines);
+    for (const nodes of nodesLines) {
+      BionicReaderBolder.run(nodes);
+    }
+
+    cardContainer.normalize();
+  }
+
+  makeBionic();
 })();
