@@ -213,5 +213,8 @@
     cardContainer.normalize();
   }
 
+  let start = performance.now();
   makeBionic();
+  let end = performance.now();
+  console.log(`Initialized bionic reading: ${end - start}ms`);
 })();
