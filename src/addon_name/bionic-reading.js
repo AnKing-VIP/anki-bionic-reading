@@ -17,14 +17,7 @@
    * @returns {number}
    */
   function getBoldLength(text) {
-    console.log("bold: ", text);
     return Math.floor(text.length / 2);
-  }
-
-  function newBoldElement(text) {
-    const elem = document.createElement("b");
-    elem.innerText = text;
-    return elem;
   }
 
   // Ignore node if any of the filters return true
@@ -33,10 +26,30 @@
     (node) => node.tagName === "STYLE",
   ];
 
+  function newBoldElement(text) {
+    const elem = document.createElement("b");
+    elem.innerText = text;
+    return elem;
+  }
+
+  function indexOfWhitespace(text, startPos) {
+    const whitespaces = [" ", "\n", "\t"];
+    let nextPos = text.length;
+    for (const whitespace of whitespaces) {
+      const next = text.indexOf(whitespace, startPos);
+      if (next !== -1 && next < nextPos) {
+        nextPos = next;
+      }
+    }
+    if (nextPos === text.length) {
+      nextPos = -1;
+    }
+    return nextPos;
+  }
+
   // Bolds a line of words
   class BionicReaderBolder {
     constructor(nodes) {
-      console.log(nodes);
       this.nodes = nodes;
       this.startNodeIndex = 0;
       this.startPos = 0;
@@ -58,7 +71,6 @@
     replaceNode() {
       const node = this.nodes[this.startNodeIndex];
       const parent = node.parentNode;
-      console.log(node, parent);
       for (let add of this.replaceNodes) {
         parent.insertBefore(add, node);
       }
@@ -68,16 +80,18 @@
 
     runWithinNode() {
       const textContent = this.nodes[this.startNodeIndex].textContent;
-      let nextPos = textContent.indexOf(" ", this.startPos);
+      let nextPos = indexOfWhitespace(textContent, this.startPos);
       while (nextPos !== -1) {
         const word = textContent.substring(this.startPos, nextPos);
         const boldLength = getBoldLength(word);
         this.replaceNodes.push(newBoldElement(word.substring(0, boldLength)));
         this.replaceNodes.push(
-          document.createTextNode(word.substring(boldLength, nextPos) + " ")
+          document.createTextNode(
+            word.substring(boldLength, nextPos) + textContent[nextPos]
+          )
         );
         this.startPos = nextPos + 1;
-        nextPos = textContent.indexOf(" ", this.startPos);
+        nextPos = indexOfWhitespace(textContent, this.startPos);
       }
     }
 
@@ -90,7 +104,7 @@
       // Find word boundary
       while (endNodeIndex < this.nodes.length) {
         const textContent = this.nodes[endNodeIndex].textContent;
-        let nextPos = textContent.indexOf(" ", endPos);
+        let nextPos = indexOfWhitespace(textContent, endPos);
         if (nextPos === -1) {
           word += textContent.substring(endPos);
           endNodeIndex += 1;
@@ -129,7 +143,9 @@
       while (this.startNodeIndex < endNodeIndex) {
         const textContent = this.nodes[this.startNodeIndex].textContent;
         const wordPart = textContent.substring(this.startPos);
-        this.replaceNodes.push(document.createTextNode(wordPart));
+        if (wordPart.length > 0) {
+          this.replaceNodes.push(document.createTextNode(wordPart));
+        }
         this.replaceNode();
         this.startNodeIndex += 1;
         this.startPos = 0;
@@ -138,7 +154,9 @@
       if (this.startPos < endPos) {
         const textContent = this.nodes[this.startNodeIndex].textContent;
         const wordPart = textContent.substring(this.startPos, endPos);
-        this.replaceNodes.push(document.createTextNode(wordPart));
+        if (wordPart.length > 0) {
+          this.replaceNodes.push(document.createTextNode(wordPart));
+        }
         this.startPos = endPos;
       }
     }
@@ -188,7 +206,6 @@
 
     let nodesLines = [[]];
     forTextNodesInTree(cardContainer, nodesLines);
-    console.log(nodesLines);
     for (const nodes of nodesLines) {
       BionicReaderBolder.run(nodes);
     }
