@@ -1,6 +1,6 @@
 # Bionic Reading
 
-Add-on for [bionic reading] on Anki cards
+Add-on for [bionic reading](https://bionic-reading.com/) on Anki cards
 
 ## How to Use
 
