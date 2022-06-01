@@ -9,7 +9,7 @@ SCRIPT_HTML = '<script src="_bionic-reading.js"></script>'
 def add_script_to_template(template: TemplateDict):
     changed = False
     for side in ["qfmt", "afmt"]:
-        html: str = template[side]
+        html: str = template[side] # type: ignore
         if SCRIPT_HTML in html:
             continue
         html += "\n"
@@ -51,13 +51,12 @@ def add_script_to_media_folder() -> None:
         mw.col.media.add_file(str(Path(__file__).parent / "_bionic-reading.js"))
 
 
-def on_delete_addon(ids: List[str]) -> None:
+def on_delete_addon(dial: Any, ids: List[str]) -> None:
     if ADDON_ID not in ids:
         return
     remove_script_from_note_types()
 
 def on_anki_start(_: Any) -> None:
-    print("on_anki_start")
     add_script_to_media_folder()
     add_script_to_note_types()
 
