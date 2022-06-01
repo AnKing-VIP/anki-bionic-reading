@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Any
 from pathlib import Path
 from aqt import gui_hooks, mw
 from anki.models import TemplateDict
@@ -56,10 +56,10 @@ def on_delete_addon(ids: List[str]) -> None:
         return
     remove_script_from_note_types()
 
-def on_anki_start() -> None:
+def on_anki_start(_: Any) -> None:
     print("on_anki_start")
     add_script_to_media_folder()
     add_script_to_note_types()
 
 gui_hooks.addons_dialog_will_delete_addons.append(on_delete_addon)
-gui_hooks.main_window_did_init.append(on_anki_start)
+gui_hooks.collection_did_load.append(on_anki_start)
