@@ -12,6 +12,10 @@ Add-on for [bionic reading](https://bionic-reading.com/) on Anki cards
 
 If you find a serious bug, please submit it on <a href="https://github.com/ankipalace/" rel="nofollow">Github</a> or email us at ankingmed@gmail.com. Please remember that we are not coders and thus may not be able to provide support.
 
+## Development
+
+Command to update ankiaddonconfig to latest master: `git subtree pull --prefix src/bionic_reading/ankiaddonconfig https://github.com/BlueGreenMagick/ankiaddonconfig.git master --squash`
+
 ## Changelog:
 
   <br>
