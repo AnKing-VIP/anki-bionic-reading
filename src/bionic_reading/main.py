@@ -2,7 +2,7 @@ from typing import List, Any
 from aqt import gui_hooks, mw
 from aqt.utils import askUser, showText
 
-
+from .gui.menu import setup_menu
 from .notetype import get_note_types_have_scripts, remove_script_from_note_types, add_script_to_media_folder
 
 ADDON_ID = mw.addonManager.addonFromModule(__name__)
@@ -34,3 +34,4 @@ def on_anki_start(_: Any) -> None:
 
 gui_hooks.addons_dialog_will_delete_addons.append(on_delete_addon)
 gui_hooks.collection_did_load.append(on_anki_start)
+setup_menu()
