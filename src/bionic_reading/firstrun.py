@@ -63,10 +63,9 @@ def save_current_version_to_conf() -> None:
 
 
 def on_update(prev: Version, curr: Version) -> None:
+    add_or_replace_script_in_media()
     if prev == "-1.-1":
         add_script_to_all_note_types()
-    else:
-        add_or_replace_script_in_media()
 
 def check_update() -> None:
     prev_version = Version()
