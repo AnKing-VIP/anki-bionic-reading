@@ -34,6 +34,13 @@ jobs:
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
 
+      - name: assert version input is valid
+        run: |
+        ! [[ "$ABC" =~ ^[0-9]+\.[0-9]+$ ]] && exit 1
+         
+      - name: update VERSION
+        run: echo ${{ github.event.inputs.version }} > ./src/bionic_reading/VERSION
+
       - name: commit version bump and create tag
         run: |
           git commit --allow-empty -m "Bump Version to v${{ github.event.inputs.version }}"
