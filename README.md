@@ -1,8 +1,12 @@
 # Bionic Reading
 
-Add-on for [bionic reading](https://bionic-reading.com/) on Anki cards
+Add-on for [bionic reading](https://bionic-reading.com/) on Anki cards. Bionic reading bolds the beginning half of each words which makes reading faster. This add-on adds bionic reading script to your note type.
 
 ## How to Use
+
+You can select which note type you want to use bionic reading in add-on config.
+
+When you add a new note type, you will need to go to the add-on config and select the note type to apply bionic reading.
 
 ---
 
