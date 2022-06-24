@@ -67,8 +67,8 @@ def remove_script_from_note_types() -> None:
         remove_script_from_note_type(note_type)
     print("removed bionic reading script from all note types")
 
-def add_script_to_media_folder() -> None:
-    # TODO: Update file when _bionic-reading.js changes
-    if not mw.col.media.have("_bionic-reading.js"):
-        print("adding _bionic-reading.js to collection")
-        mw.col.media.add_file(str(Path(__file__).parent / "_bionic-reading.js"))
+def add_or_replace_script_in_media() -> None:
+    if mw.col.media.have("_bionic-reading.js"):
+        mw.col.media.trash_files(["_bionic-reading.js"])
+    print("adding _bionic-reading.js to collection")
+    mw.col.media.add_file(str(Path(__file__).parent / "_bionic-reading.js"))

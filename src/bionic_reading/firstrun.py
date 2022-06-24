@@ -4,7 +4,7 @@ import os
 
 from aqt import mw
 
-from .notetype import add_script_to_all_note_types
+from .notetype import add_script_to_all_note_types, add_or_replace_script_in_media
 
 config = mw.addonManager.getConfig(__name__)
 
@@ -66,7 +66,7 @@ def on_update(prev: Version, curr: Version) -> None:
     if prev == "-1.-1":
         add_script_to_all_note_types()
     else:
-        pass
+        add_or_replace_script_in_media()
 
 def check_update() -> None:
     prev_version = Version()
@@ -75,5 +75,5 @@ def check_update() -> None:
 
     if prev_version != str(curr_version):
         on_update(prev_version, curr_version)
-
+    
     
