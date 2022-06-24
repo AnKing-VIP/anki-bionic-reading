@@ -36,8 +36,8 @@ jobs:
 
       - name: assert version input is valid
         run: |
-        ! [[ "$ABC" =~ ^[0-9]+\.[0-9]+$ ]] && exit 1
-         
+          ! [[ "$ABC" =~ ^[0-9]+\.[0-9]+$ ]] && exit 1
+
       - name: update VERSION
         run: echo ${{ github.event.inputs.version }} > ./src/bionic_reading/VERSION
 
