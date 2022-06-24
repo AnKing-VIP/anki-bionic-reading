@@ -46,6 +46,9 @@ class Version:
     def __le__(self, other: str) -> bool:
         return self == other or self < other
 
+    def __str__(self) -> str:
+        return f"{self.major}.{self.minor}"
+
 
 def save_current_version_to_conf() -> None:
     # For debugging
@@ -70,8 +73,7 @@ def check_update() -> None:
     save_current_version_to_conf()
     curr_version = Version()
 
-    if prev_version != curr_version:
+    if prev_version != str(curr_version):
         on_update(prev_version, curr_version)
 
-check_update()
     
