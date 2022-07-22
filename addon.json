@@ -2,8 +2,8 @@
     "display_name": "Bionic Reading",
     "module_name": "bionic_reading",
     "repo_name": "anki-bionic-reading",
-    "ankiweb_id": "",
-    "author": "Bluegreenmagick",
+    "ankiweb_id": "649714433",
+    "author": "The AnKing, Bluegreenmagick",
     "conflicts": [],
     "targets": [
         "anki21"
