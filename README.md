@@ -23,7 +23,7 @@ Command to update ankiaddonconfig to latest master: `git subtree pull --prefix s
 ## Changelog:
 
   <br>
-2021-*****: Initial Release
+2021-2022: Initial Release
 
 ### If you like these, please consider donating to this project
 
