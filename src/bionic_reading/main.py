@@ -4,7 +4,7 @@ from aqt.utils import askUser, showText
 
 from .gui.menu import setup_menu
 from .firstrun import check_update
-from .notetype import get_note_types_have_scripts, remove_script_from_note_types
+from .notetype import get_note_types_have_scripts, remove_script_from_all_note_types
 
 ADDON_ID = mw.addonManager.addonFromModule(__name__)
 
@@ -21,7 +21,7 @@ def on_delete_addon(dial: Any, ids: List[str]) -> None:
         if has_script:
             remove = askUser("Remove Bionic Reading scripts from all note types?", title="Bionic Reading")
             if remove:
-                remove_script_from_note_types()
+                remove_script_from_all_note_types()
     except Exception as e:
         showText(
             "Error occured while deleting add-on Bionic Reading.\n"

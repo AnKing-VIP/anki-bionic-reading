@@ -61,7 +61,7 @@ def remove_script_from_note_type(note_type: "anki.models.NoteTypeDict") -> bool:
     mw.col.models.update_dict(note_type)
     return changed
 
-def remove_script_from_note_types() -> None:
+def remove_script_from_all_note_types() -> None:
     note_types = mw.col.models.all()
     for note_type in note_types:
         remove_script_from_note_type(note_type)
