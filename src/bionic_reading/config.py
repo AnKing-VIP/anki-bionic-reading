@@ -1,11 +1,17 @@
-
 from aqt.qt import QListWidget, QListWidgetItem, Qt, QPushButton
 from aqt import mw
 
 from .ankiaddonconfig import ConfigManager, ConfigWindow
-from .notetype import get_note_types_have_scripts, add_script_to_note_type, add_script_to_all_note_types, remove_script_from_note_type, remove_script_from_all_note_types
+from .notetype import (
+    get_note_types_have_scripts,
+    add_script_to_note_type,
+    add_script_to_all_note_types,
+    remove_script_from_note_type,
+    remove_script_from_all_note_types,
+)
 
 conf = ConfigManager()
+
 
 def all_notetypes_are_checked(list_widget: QListWidget) -> bool:
     cnt = list_widget.count()
@@ -15,6 +21,7 @@ def all_notetypes_are_checked(list_widget: QListWidget) -> bool:
             return False
     return True
 
+
 def update_note_types_list(list_widget: QListWidget) -> None:
     list_widget.clear()
     note_types = get_note_types_have_scripts()
@@ -23,6 +30,7 @@ def update_note_types_list(list_widget: QListWidget) -> None:
         item.setCheckState(note_types[note_type])
         list_widget.addItem(item)
 
+
 def on_item_checked(item: QListWidgetItem) -> None:
     name = item.text()
     note_type = mw.col.models.get(mw.col.models.id_for_name(name))
@@ -30,7 +38,7 @@ def on_item_checked(item: QListWidgetItem) -> None:
         add_script_to_note_type(note_type)
     elif item.checkState() == Qt.CheckState.Unchecked:
         remove_script_from_note_type(note_type)
-    
+
 
 def config_tab(window: ConfigWindow) -> None:
     tab = window.add_tab("General")
@@ -44,12 +52,14 @@ def config_tab(window: ConfigWindow) -> None:
 
     btn_lay = tab.hlayout()
     button = QPushButton("Toggle All Notetypes")
+
     def on_click(_: bool) -> None:
         if all_notetypes_are_checked(list_widget):
             remove_script_from_all_note_types()
         else:
             add_script_to_all_note_types()
         window.update_widgets()
+
     button.clicked.connect(on_click)
     btn_lay.addWidget(button)
     btn_lay.stretch()

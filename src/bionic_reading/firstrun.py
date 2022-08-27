@@ -67,6 +67,7 @@ def on_update(prev: Version, curr: Version) -> None:
     if prev == "-1.-1":
         add_script_to_all_note_types()
 
+
 def check_update() -> None:
     prev_version = Version()
     save_current_version_to_conf()
@@ -74,5 +75,3 @@ def check_update() -> None:
 
     if prev_version != str(curr_version):
         on_update(prev_version, curr_version)
-    
-    
