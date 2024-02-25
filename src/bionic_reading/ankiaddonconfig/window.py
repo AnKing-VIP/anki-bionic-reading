@@ -30,8 +30,7 @@ class ConfigWindow(QDialog):
         self.setup()
 
     def setup(self) -> None:
-        self.outer_layout = ConfigLayout(
-            self, QBoxLayout.Direction.TopToBottom)
+        self.outer_layout = ConfigLayout(self, QBoxLayout.Direction.TopToBottom)
         self.main_layout = ConfigLayout(self, QBoxLayout.Direction.TopToBottom)
         self.btn_layout = ConfigLayout(self, QBoxLayout.Direction.LeftToRight)
         self.outer_layout.addLayout(self.main_layout)
@@ -575,8 +574,7 @@ class ConfigLayout(QBoxLayout):
     ) -> "ConfigLayout":
         """Adds QScrollArea > QWidget*2 > ConfigLayout, returns the layout."""
         # QScrollArea seems to automatically add a child widget.
-        layout = ConfigLayout(self.config_window,
-                              QBoxLayout.Direction.TopToBottom)
+        layout = ConfigLayout(self.config_window, QBoxLayout.Direction.TopToBottom)
         inner_widget = QWidget()
         inner_widget.setLayout(layout)
         scroll = QScrollArea()
