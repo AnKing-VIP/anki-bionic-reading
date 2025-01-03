@@ -29,7 +29,7 @@
 
   function newBoldElement(text) {
     const elem = document.createElement("b");
-    elem.innerText = text;
+    elem.innerText = text.join("");
     return elem;
   }
 
@@ -80,15 +80,15 @@
     }
 
     runWithinNode() {
-      const textContent = this.nodes[this.startNodeIndex].textContent;
+      const textContent = Array.from(this.nodes[this.startNodeIndex].textContent);
       let nextPos = indexOfWhitespace(textContent, this.startPos);
       while (nextPos !== -1) {
-        const word = textContent.substring(this.startPos, nextPos);
+        const word = textContent.slice(this.startPos, nextPos);
         const boldLength = getBoldLength(word);
-        this.replaceNodes.push(newBoldElement(word.substring(0, boldLength)));
+        this.replaceNodes.push(newBoldElement(word.slice(0, boldLength)));
         this.replaceNodes.push(
           document.createTextNode(
-            word.substring(boldLength, nextPos) + textContent[nextPos]
+            word.slice(boldLength, nextPos).concat(textContent[nextPos]).join("")
           )
         );
         this.startPos = nextPos + 1;
@@ -104,14 +104,14 @@
 
       // Find word boundary
       while (endNodeIndex < this.nodes.length) {
-        const textContent = this.nodes[endNodeIndex].textContent;
+        const textContent = Array.from(this.nodes[endNodeIndex].textContent);
         let nextPos = indexOfWhitespace(textContent, endPos);
         if (nextPos === -1) {
-          word += textContent.substring(endPos);
+          word += textContent.slice(endPos);
           endNodeIndex += 1;
           endPos = 0;
         } else {
-          word += textContent.substring(endPos, nextPos);
+          word += textContent.slice(endPos, nextPos);
           endPos = nextPos;
           break;
         }
@@ -121,16 +121,16 @@
 
       // Bold part of word
       while (remainingBoldLength > 0) {
-        const textContent = this.nodes[this.startNodeIndex].textContent;
+        const textContent = Array.from(this.nodes[this.startNodeIndex].textContent);
         if (remainingBoldLength > textContent.length - this.startPos) {
-          const wordPart = textContent.substring(this.startPos);
+          const wordPart = textContent.slice(this.startPos);
           remainingBoldLength -= wordPart.length;
           this.replaceNodes.push(newBoldElement(wordPart));
           this.replaceNode();
           this.startNodeIndex += 1;
           this.startPos = 0;
         } else {
-          const wordPart = textContent.substring(
+          const wordPart = textContent.slice(
             this.startPos,
             this.startPos + remainingBoldLength
           );
@@ -142,10 +142,10 @@
 
       // Add non-bolded part of words
       while (this.startNodeIndex < endNodeIndex) {
-        const textContent = this.nodes[this.startNodeIndex].textContent;
-        const wordPart = textContent.substring(this.startPos);
+        const textContent = Array.from(this.nodes[this.startNodeIndex].textContent);
+        const wordPart = textContent.slice(this.startPos);
         if (wordPart.length > 0) {
-          this.replaceNodes.push(document.createTextNode(wordPart));
+          this.replaceNodes.push(document.createTextNode(wordPart.join("")));
         }
         this.replaceNode();
         this.startNodeIndex += 1;
@@ -153,10 +153,10 @@
       }
 
       if (this.startPos < endPos) {
-        const textContent = this.nodes[this.startNodeIndex].textContent;
-        const wordPart = textContent.substring(this.startPos, endPos);
+        const textContent = Array.from(this.nodes[this.startNodeIndex].textContent);
+        const wordPart = textContent.slice(this.startPos, endPos);
         if (wordPart.length > 0) {
-          this.replaceNodes.push(document.createTextNode(wordPart));
+          this.replaceNodes.push(document.createTextNode(wordPart.join("")));
         }
         this.startPos = endPos;
       }
