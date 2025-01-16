@@ -39,7 +39,7 @@ class AnkingIconsLayout(QHBoxLayout):
         self.addStretch()
 
 
-class AnkiPalaceLayout(QHBoxLayout):
+class MasteryCourseLayout(QHBoxLayout):
     def __init__(self, parent: QWidget) -> None:
         QHBoxLayout.__init__(self, parent)
         self.setContentsMargins(0, 0, 0, 0)
@@ -51,7 +51,7 @@ class AnkiPalaceLayout(QHBoxLayout):
         icon_data = (
             "AnKingSmall.png",
             (64, 64),
-            f"https://courses.ankipalace.com/?utm_source={addon_name}&utm_medium=anki_add-on&utm_campaign=mastery_course",
+            f"https://www.theanking.com/anki-mastery-course/?utm_source={addon_name}&utm_medium=anki_add-on&utm_campaign=mastery_course",
         )
         btn = icon_button(icon_data)
         self.addStretch()

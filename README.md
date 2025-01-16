@@ -14,7 +14,7 @@ When you add a new note type, you will need to go to the add-on config and selec
 
 ## Problems, Bugs, Errors, Improvements
 
-If you find a serious bug, please submit it on <a href="https://github.com/ankipalace/" rel="nofollow">Github</a> or email us at ankingmed@gmail.com. Please remember that we are not coders and thus may not be able to provide support.
+If you find a serious bug, please submit it on <a href="https://github.com/AnKing-VIP/" rel="nofollow">Github</a> or email us at ankingmed@gmail.com. Please remember that we are not coders and thus may not be able to provide support.
 
 ## Development
 
