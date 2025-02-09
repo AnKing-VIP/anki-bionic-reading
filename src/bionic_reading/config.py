@@ -31,6 +31,7 @@ def update_note_types_list(list_widget: QListWidget) -> None:
         item.setCheckState(note_types[note_type])
         list_widget.addItem(item)
 
+
 def on_config_save(notetype_listwidget: QListWidget) -> None:
     notetype_names_states: List[Tuple[str, bool]] = []
     for i in range(notetype_listwidget.count()):
