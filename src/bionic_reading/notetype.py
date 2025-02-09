@@ -1,4 +1,4 @@
-from typing import List, Dict
+from typing import Dict
 from pathlib import Path
 from aqt import mw
 import anki.models
@@ -60,8 +60,11 @@ def remove_script_from_note_type(note_type: "anki.models.NoteTypeDict") -> bool:
     for template in templates:
         for side in ["qfmt", "afmt"]:
             html: str = template[side]
+            if SCRIPT_HTML not in html:
+                continue
             template[side] = html.replace(SCRIPT_HTML, "")
-    mw.col.models.update_dict(note_type)
+            changed = True
+
     return changed
 
 
@@ -69,6 +72,7 @@ def remove_script_from_all_note_types() -> None:
     note_types = mw.col.models.all()
     for note_type in note_types:
         remove_script_from_note_type(note_type)
+        mw.col.models.update_dict(note_type)
     print("removed bionic reading script from all note types")
 
 

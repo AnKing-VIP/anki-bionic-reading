@@ -1,13 +1,14 @@
-from aqt.qt import QListWidget, QListWidgetItem, Qt, QPushButton
+from concurrent.futures import Future
+from typing import List, Tuple
+from anki.models import NotetypeDict
 from aqt import mw
+from aqt.qt import QListWidget, QListWidgetItem, QPushButton, Qt
 
 from .ankiaddonconfig import ConfigManager, ConfigWindow
 from .notetype import (
-    get_note_types_have_scripts,
     add_script_to_note_type,
-    add_script_to_all_note_types,
+    get_note_types_have_scripts,
     remove_script_from_note_type,
-    remove_script_from_all_note_types,
 )
 
 conf = ConfigManager()
@@ -30,14 +31,34 @@ def update_note_types_list(list_widget: QListWidget) -> None:
         item.setCheckState(note_types[note_type])
         list_widget.addItem(item)
 
+def on_config_save(notetype_listwidget: QListWidget) -> None:
+    notetype_names_states: List[Tuple[str, bool]] = []
+    for i in range(notetype_listwidget.count()):
+        item = notetype_listwidget.item(i)
+        notetype_names_states.append(
+            (item.text(), item.checkState() == Qt.CheckState.Checked)
+        )
 
-def on_item_checked(item: QListWidgetItem) -> None:
-    name = item.text()
-    note_type = mw.col.models.get(mw.col.models.id_for_name(name))
-    if item.checkState() == Qt.CheckState.Checked:
-        add_script_to_note_type(note_type)
-    elif item.checkState() == Qt.CheckState.Unchecked:
-        remove_script_from_note_type(note_type)
+    def task() -> None:
+        updated_notetypes: List[NotetypeDict] = []
+        for name, checked in notetype_names_states:
+            notetype = mw.col.models.by_name(name)
+            changed = False
+            if checked:
+                changed = add_script_to_note_type(notetype)
+            else:
+                changed = remove_script_from_note_type(notetype)
+            if changed:
+                updated_notetypes.append(notetype)
+        for notetype in updated_notetypes:
+            mw.col.models.update_dict(notetype)
+
+    def on_done(future: Future) -> None:
+        future.result()
+
+    mw.taskman.with_progress(
+        task=task, on_done=on_done, parent=mw, label="Updating note types"
+    )
 
 
 def config_tab(window: ConfigWindow) -> None:
@@ -46,23 +67,30 @@ def config_tab(window: ConfigWindow) -> None:
 
     list_widget = QListWidget()
     update_note_types_list(list_widget)
-    list_widget.itemChanged.connect(on_item_checked)
     window.widget_updates.append(lambda: update_note_types_list(list_widget))
     tab.addWidget(list_widget)
 
     btn_lay = tab.hlayout()
-    button = QPushButton("Toggle All Notetypes")
+    toggle_all_button = QPushButton("Toggle All Notetypes")
 
-    def on_click(_: bool) -> None:
-        if all_notetypes_are_checked(list_widget):
-            remove_script_from_all_note_types()
-        else:
-            add_script_to_all_note_types()
-        window.update_widgets()
+    def on_toggle_all(_: bool) -> None:
+        all_checked = True
+        for i in range(list_widget.count()):
+            item = list_widget.item(i)
+            if item.checkState() != Qt.CheckState.Checked:
+                all_checked = False
+                break
+        for i in range(list_widget.count()):
+            item = list_widget.item(i)
+            item.setCheckState(
+                Qt.CheckState.Checked if not all_checked else Qt.CheckState.Unchecked
+            )
 
-    button.clicked.connect(on_click)
-    btn_lay.addWidget(button)
+    toggle_all_button.clicked.connect(on_toggle_all)
+    btn_lay.addWidget(toggle_all_button)
     btn_lay.stretch()
+
+    window.execute_on_save(lambda: on_config_save(list_widget))
 
 
 conf.use_custom_window()
