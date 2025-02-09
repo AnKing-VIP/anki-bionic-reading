@@ -1,7 +1,7 @@
 from typing import Dict
 from pathlib import Path
 from aqt import mw
-import anki.models
+from anki.models import NotetypeDict
 from aqt.qt import Qt
 
 SCRIPT_HTML = '<script src="_bionic-reading.js"></script>'
@@ -30,7 +30,7 @@ def get_note_types_have_scripts() -> Dict[str, Qt.CheckState]:
     return note_types_have_script
 
 
-def add_script_to_note_type(note_type: "anki.models.NoteTypeDict") -> bool:
+def add_script_to_note_type(note_type: NotetypeDict) -> bool:
     changed = False
     for side in ["qfmt", "afmt"]:
         templates = note_type["tmpls"]
@@ -54,7 +54,7 @@ def add_script_to_all_note_types() -> None:
             mw.col.models.update_dict(note_type)
 
 
-def remove_script_from_note_type(note_type: "anki.models.NoteTypeDict") -> bool:
+def remove_script_from_note_type(note_type: NotetypeDict) -> bool:
     templates = note_type["tmpls"]
     changed = False
     for template in templates:
