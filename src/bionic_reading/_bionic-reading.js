@@ -25,6 +25,7 @@
     (elem) => elem.tagName === "SCRIPT",
     (elem) => elem.tagName === "STYLE",
     (elem) => elem.classList.contains("cloze"),
+    (elem) => elem.tagName === "MJX-CONTAINER",
   ];
 
   function newBoldElement(text) {
@@ -214,8 +215,15 @@
     cardContainer.normalize();
   }
 
-  let start = performance.now();
-  makeBionic();
-  let end = performance.now();
-  console.log(`Initialized bionic reading: ${end - start}ms`);
+  function init() {
+    let start = performance.now();
+    makeBionic();
+    let end = performance.now();
+    console.log(`Initialized bionic reading: ${end - start}ms`);
+  }
+  if(globalThis.onShownHook) {
+    onShownHook.push(init);
+  } else {
+    init();
+  }
 })();
